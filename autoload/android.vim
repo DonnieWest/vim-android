@@ -101,6 +101,29 @@ function! android#install(mode)
   endfor
 endfunction
 
+function! android#launch(mode)
+  let l:devices = adb#selectDevice()
+
+  for l:device in l:devices
+    call android#logi("Install " . a:mode . " " . l:device)
+    let l:result = gradle#install(l:device, a:mode)
+    if (l:result[0] > 0) || (l:result[1] > 0)
+      call android#logi("Install failed")
+      return
+    else
+      call android#logi ("")
+    endif
+
+    let l:launchResult = adb#launchApp(l:device)
+    if (l:launchResult[0] > 0) || (l:launchResult[1] > 0)
+      call android#logi("Install failed")
+      return
+    else
+      call android#logi ("")
+    endif
+  endfor
+endfunction
+
 function! android#uninstall(mode)
 
   let l:devices = adb#selectDevice()
@@ -305,6 +328,7 @@ function! android#setupAndroidCommands()
     command! -nargs=+ Android call android#compile(<f-args>)
     command! -nargs=? AndroidBuild call android#compile(<f-args>)
     command! -nargs=1 AndroidInstall call android#install(<f-args>)
+    command! -nargs=1 AndroidLaunch call android#launch(<f-args>)
     command! -nargs=1 AndroidUninstall call android#uninstall(<f-args>)
     command! AndroidDevices call android#listDevices()
     command! AndroidEmulator call android#emulator()

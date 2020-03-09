@@ -87,6 +87,12 @@ function! adb#getProperty(device, property)
   return s:chomp(system(join(l:cmd, ' ')))
 endfunction
 
+function! adb#launchApp(device)
+  let l:activity = apk#getApplicationId() . '/' apk#getMainActivityId()
+
+  return system(adb#bin() . ' -s ' . a:device . ' shell am start ' . l:activity . ' -a android.intent.action.MAIN -c android.intent.category.LAUNCHER')
+endfunction
+
 function! adb#getDeviceSdk(device)
   return adb#getProperty(a:device, 'ro.build.version.sdk')
 endfunction
